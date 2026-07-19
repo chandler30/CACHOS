@@ -1,8 +1,11 @@
 {
-  "installCommand": "npm install",
   "buildCommand": "",
   "outputDirectory": "public",
+  "functions": {
+    "api/handler.js": { "maxDuration": 10 }
+  },
   "rewrites": [
-    { "source": "/t/:code", "destination": "/api/track/:code" }
+    { "source": "/t/:code", "destination": "/api/handler?action=track&code=:code" },
+    { "source": "/api/:path*", "destination": "/api/handler" }
   ]
 }

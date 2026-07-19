@@ -18,7 +18,6 @@
       --accent2: #a29bfe;
       --danger: #e74c3c;
       --success: #2ecc71;
-      --warn: #f39c12;
     }
 
     body {
@@ -37,18 +36,11 @@
       justify-content: space-between;
     }
 
-    .header h1 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--accent2);
-    }
-
+    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 2px; color: var(--accent2); }
     .header h1 span { color: var(--text2); font-weight: 400; font-size: 14px; }
 
     .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
 
-    /* Create form */
     .create-form {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -57,17 +49,9 @@
       margin-bottom: 24px;
     }
 
-    .create-form h2 {
-      font-size: 16px;
-      margin-bottom: 16px;
-      color: var(--accent2);
-    }
+    .create-form h2 { font-size: 16px; margin-bottom: 16px; color: var(--accent2); }
 
-    .form-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
 
     .form-row input {
       flex: 1;
@@ -83,7 +67,6 @@
     }
 
     .form-row input:focus { border-color: var(--accent); }
-
     .form-row input::placeholder { color: var(--text2); }
 
     .btn {
@@ -104,7 +87,6 @@
     .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
     .btn-ghost:hover { border-color: var(--accent); color: var(--accent2); }
 
-    /* Links list */
     .links-grid { display: flex; flex-direction: column; gap: 12px; }
 
     .link-card {
@@ -125,10 +107,7 @@
       margin-bottom: 8px;
     }
 
-    .link-card-title {
-      font-weight: 600;
-      font-size: 15px;
-    }
+    .link-card-title { font-weight: 600; font-size: 15px; }
 
     .link-card-meta {
       display: flex;
@@ -159,7 +138,6 @@
 
     .badge-visits { background: rgba(108,92,231,0.15); color: var(--accent2); }
 
-    /* Detail / Visits view */
     .detail-panel {
       display: none;
       background: var(--surface);
@@ -180,11 +158,7 @@
 
     .detail-header h2 { font-size: 18px; color: var(--accent2); }
 
-    .visits-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
+    .visits-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
     .visits-table th {
       text-align: left;
@@ -204,20 +178,10 @@
 
     .visits-table tr:hover td { background: rgba(108,92,231,0.05); }
 
-    .map-link {
-      color: var(--accent2);
-      text-decoration: none;
-      font-size: 12px;
-    }
-
+    .map-link { color: var(--accent2); text-decoration: none; font-size: 12px; }
     .map-link:hover { text-decoration: underline; }
 
-    .empty-state {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--text2);
-    }
-
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text2); }
     .empty-state p { font-size: 14px; }
 
     .toast {
@@ -238,12 +202,7 @@
 
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    .stats-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+    .stats-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
 
     .stat-card {
       background: var(--bg);
@@ -262,15 +221,12 @@
       margin-bottom: 4px;
     }
 
-    .stat-card .stat-value {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--accent2);
-    }
+    .stat-card .stat-value { font-size: 22px; font-weight: 700; color: var(--accent2); }
 
     .actions { display: flex; gap: 8px; }
-
     .table-wrap { overflow-x: auto; }
+
+    .loading { color: var(--text2); text-align: center; padding: 12px; font-size: 13px; }
 
     @media (max-width: 600px) {
       .container { padding: 12px; }
@@ -286,7 +242,6 @@
 </div>
 
 <div class="container">
-  <!-- Create Link Form -->
   <div class="create-form">
     <h2>Crear enlace de rastreo</h2>
     <div class="form-row">
@@ -296,13 +251,12 @@
     </div>
   </div>
 
-  <!-- Detail Panel -->
   <div class="detail-panel" id="detailPanel">
     <div class="detail-header">
       <h2 id="detailTitle">Visitas</h2>
       <div class="actions">
         <button class="btn btn-ghost btn-sm" onclick="closeDetail()">Cerrar</button>
-        <button class="btn btn-danger btn-sm" id="btnDelete" onclick="deleteCurrentLink()">Eliminar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCurrentLink()">Eliminar</button>
       </div>
     </div>
     <div class="stats-row" id="statsRow"></div>
@@ -324,15 +278,41 @@
     </div>
   </div>
 
-  <!-- Links List -->
   <div class="links-grid" id="linksList"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  let currentLinkId = null;
+  let currentCode = null;
 
+  // --- localStorage helpers ---
+  function getLinks() {
+    try { return JSON.parse(localStorage.getItem('cachos_links') || '[]'); }
+    catch { return []; }
+  }
+
+  function saveLinks(links) {
+    localStorage.setItem('cachos_links', JSON.stringify(links));
+  }
+
+  function generateCode() {
+    const a = new Uint8Array(4);
+    crypto.getRandomValues(a);
+    return Array.from(a, b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function toBase64Url(str) {
+    return btoa(unescape(encodeURIComponent(str)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function getTrackingUrl(code, destination) {
+    const dest = toBase64Url(destination);
+    return location.origin + '/t/' + code + '?dest=' + dest;
+  }
+
+  // --- UI ---
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -340,13 +320,8 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  function getTrackingUrl(code) {
-    return `${location.origin}/t/${code}`;
-  }
-
-  async function loadLinks() {
-    const res = await fetch('/api/links');
-    const links = await res.json();
+  function renderLinks() {
+    const links = getLinks();
     const container = document.getElementById('linksList');
 
     if (links.length === 0) {
@@ -355,94 +330,125 @@
     }
 
     container.innerHTML = links.map(l => `
-      <div class="link-card" onclick="openDetail('${l.id}', '${escHtml(l.title || l.code)}')">
+      <div class="link-card" onclick="openDetail('${esc(l.code)}', '${esc(l.title || l.code)}')">
         <div class="link-card-top">
-          <span class="link-card-title">${escHtml(l.title || 'Sin nombre')}</span>
-          <span class="badge badge-visits">${l.visit_count} visita${l.visit_count !== 1 ? 's' : ''}</span>
+          <span class="link-card-title">${esc(l.title || 'Sin nombre')}</span>
+          <span class="badge badge-visits" id="badge-${esc(l.code)}">...</span>
         </div>
         <div class="link-card-meta">
-          <span class="tracking-url" onclick="event.stopPropagation(); copyUrl('${l.code}')">${getTrackingUrl(l.code)}</span>
-          <span>Destino: ${escHtml(truncate(l.destination, 50))}</span>
+          <span class="tracking-url" onclick="event.stopPropagation(); copyUrl('${esc(l.code)}', '${esc(l.destination)}')">${location.origin}/t/${esc(l.code)}</span>
+          <span>Destino: ${esc(truncate(l.destination, 50))}</span>
           <span>${timeAgo(l.created_at)}</span>
         </div>
       </div>
     `).join('');
+
+    links.forEach(l => loadVisitCount(l.code));
   }
 
-  async function createLink() {
-    const destination = document.getElementById('inputUrl').value.trim();
-    const title = document.getElementById('inputTitle').value.trim();
-    if (!destination) return showToast('Ingresa una URL de destino');
-
-    const res = await fetch('/api/links', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ destination, title }),
-    });
-
-    if (res.ok) {
-      const link = await res.json();
-      document.getElementById('inputUrl').value = '';
-      document.getElementById('inputTitle').value = '';
-      await navigator.clipboard.writeText(getTrackingUrl(link.code)).catch(() => {});
-      showToast('Enlace creado y copiado al portapapeles');
-      loadLinks();
+  async function loadVisitCount(code) {
+    const badge = document.getElementById('badge-' + code);
+    if (!badge) return;
+    try {
+      const res = await fetch('/api/handler?action=visits&code=' + code);
+      const visits = await res.json();
+      const n = visits.length;
+      badge.textContent = n + ' visita' + (n !== 1 ? 's' : '');
+    } catch {
+      badge.textContent = '?';
     }
   }
 
-  async function openDetail(id, title) {
-    currentLinkId = id;
+  function createLink() {
+    const urlInput = document.getElementById('inputUrl');
+    const titleInput = document.getElementById('inputTitle');
+    const destination = urlInput.value.trim();
+    const title = titleInput.value.trim();
+
+    if (!destination) return showToast('Ingresa una URL de destino');
+
+    try { new URL(destination); } catch {
+      return showToast('URL no valida');
+    }
+
+    const code = generateCode();
+    const links = getLinks();
+    links.unshift({ code, destination, title, created_at: new Date().toISOString() });
+    saveLinks(links);
+
+    urlInput.value = '';
+    titleInput.value = '';
+
+    const trackUrl = getTrackingUrl(code, destination);
+    navigator.clipboard.writeText(trackUrl).catch(() => {});
+    showToast('Enlace creado y copiado');
+    renderLinks();
+  }
+
+  async function openDetail(code, title) {
+    currentCode = code;
     document.getElementById('detailTitle').textContent = title;
     document.getElementById('detailPanel').classList.add('active');
+    document.getElementById('statsRow').innerHTML = '<div class="loading">Cargando visitas...</div>';
+    document.getElementById('visitsBody').innerHTML = '';
 
-    const res = await fetch(`/api/links/${id}/visits`);
-    const visits = await res.json();
+    try {
+      const res = await fetch('/api/handler?action=visits&code=' + code);
+      const visits = await res.json();
 
-    const countries = [...new Set(visits.map(v => v.country))].filter(Boolean);
-    document.getElementById('statsRow').innerHTML = `
-      <div class="stat-card"><div class="stat-label">Total visitas</div><div class="stat-value">${visits.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Paises</div><div class="stat-value">${countries.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Ultima visita</div><div class="stat-value" style="font-size:14px">${visits.length ? timeAgo(visits[0].visited_at) : '-'}</div></div>
-    `;
+      const countries = [...new Set(visits.map(v => v.country).filter(Boolean))];
+      document.getElementById('statsRow').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total visitas</div><div class="stat-value">${visits.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Paises</div><div class="stat-value">${countries.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Ultima visita</div><div class="stat-value" style="font-size:14px">${visits.length ? timeAgo(visits[visits.length - 1].visited_at) : '-'}</div></div>
+      `;
 
-    document.getElementById('visitsBody').innerHTML = visits.length === 0
-      ? '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:24px">Sin visitas todavia</td></tr>'
-      : visits.map(v => `
-        <tr>
-          <td>${formatDate(v.visited_at)}</td>
-          <td style="font-family:monospace;font-size:12px">${escHtml(v.ip)}</td>
-          <td>${escHtml(v.country)}</td>
-          <td>${escHtml(v.region)}</td>
-          <td>${escHtml(v.city)}</td>
-          <td>${v.lat && v.lon ? `<a class="map-link" href="https://www.google.com/maps?q=${v.lat},${v.lon}" target="_blank">Ver mapa</a>` : '-'}</td>
-          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${escHtml(v.user_agent || '')}</td>
-        </tr>
-      `).join('');
+      document.getElementById('visitsBody').innerHTML = visits.length === 0
+        ? '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:24px">Sin visitas todavia</td></tr>'
+        : visits.slice().reverse().map(v => `
+          <tr>
+            <td>${formatDate(v.visited_at)}</td>
+            <td style="font-family:monospace;font-size:12px">${esc(v.ip)}</td>
+            <td>${esc(v.country)}</td>
+            <td>${esc(v.region)}</td>
+            <td>${esc(v.city)}</td>
+            <td>${v.lat && v.lon ? '<a class="map-link" href="https://www.google.com/maps?q=' + v.lat + ',' + v.lon + '" target="_blank">Ver mapa</a>' : '-'}</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${esc(v.user_agent || '')}</td>
+          </tr>
+        `).join('');
+    } catch {
+      document.getElementById('statsRow').innerHTML = '<div class="loading">Error al cargar visitas</div>';
+    }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function closeDetail() {
     document.getElementById('detailPanel').classList.remove('active');
-    currentLinkId = null;
+    currentCode = null;
   }
 
   async function deleteCurrentLink() {
-    if (!currentLinkId) return;
+    if (!currentCode) return;
     if (!confirm('Eliminar este enlace y todas sus visitas?')) return;
-    await fetch(`/api/links/${currentLinkId}`, { method: 'DELETE' });
+
+    const links = getLinks().filter(l => l.code !== currentCode);
+    saveLinks(links);
+
+    try { await fetch('/api/handler?action=clear&code=' + currentCode, { method: 'DELETE' }); } catch {}
+
     closeDetail();
     showToast('Enlace eliminado');
-    loadLinks();
+    renderLinks();
   }
 
-  async function copyUrl(code) {
-    const url = getTrackingUrl(code);
-    await navigator.clipboard.writeText(url).catch(() => {});
-    showToast('URL copiada: ' + url);
+  function copyUrl(code, destination) {
+    const url = getTrackingUrl(code, destination);
+    navigator.clipboard.writeText(url).catch(() => {});
+    showToast('URL copiada');
   }
 
-  function escHtml(s) {
+  function esc(s) {
     if (!s) return '';
     const d = document.createElement('div');
     d.textContent = s;
@@ -455,24 +461,23 @@
 
   function formatDate(d) {
     if (!d) return '-';
-    const dt = new Date(d);
-    return dt.toLocaleString('es');
+    return new Date(d).toLocaleString('es');
   }
 
   function timeAgo(d) {
     if (!d) return '';
     const diff = (Date.now() - new Date(d).getTime()) / 1000;
     if (diff < 60) return 'hace un momento';
-    if (diff < 3600) return `hace ${Math.floor(diff/60)} min`;
-    if (diff < 86400) return `hace ${Math.floor(diff/3600)}h`;
-    return `hace ${Math.floor(diff/86400)}d`;
+    if (diff < 3600) return 'hace ' + Math.floor(diff / 60) + ' min';
+    if (diff < 86400) return 'hace ' + Math.floor(diff / 3600) + 'h';
+    return 'hace ' + Math.floor(diff / 86400) + 'd';
   }
 
   document.getElementById('inputUrl').addEventListener('keydown', e => {
     if (e.key === 'Enter') createLink();
   });
 
-  loadLinks();
+  renderLinks();
 </script>
 
 </body>
