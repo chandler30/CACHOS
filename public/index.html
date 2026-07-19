@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CACHOS - Link Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a2e;
+      --border: #2a2a3e;
+      --text: #e0e0e8;
+      --text2: #8888a0;
+      --accent: #6c5ce7;
+      --accent2: #a29bfe;
+      --danger: #e74c3c;
+      --success: #2ecc71;
+      --warn: #f39c12;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent2);
+    }
+
+    .header h1 span { color: var(--text2); font-weight: 400; font-size: 14px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    /* Create form */
+    .create-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .create-form h2 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      color: var(--accent2);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .form-row input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-row input:focus { border-color: var(--accent); }
+
+    .form-row input::placeholder { color: var(--text2); }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { opacity: 0.8; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent2); }
+
+    /* Links list */
+    .links-grid { display: flex; flex-direction: column; gap: 12px; }
+
+    .link-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .link-card:hover { border-color: var(--accent); }
+
+    .link-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .link-card-title {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .link-card-meta {
+      display: flex;
+      gap: 16px;
+      color: var(--text2);
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    .link-card-meta .tracking-url {
+      color: var(--accent2);
+      font-family: monospace;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .link-card-meta .tracking-url:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-visits { background: rgba(108,92,231,0.15); color: var(--accent2); }
+
+    /* Detail / Visits view */
+    .detail-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .detail-panel.active { display: block; }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .detail-header h2 { font-size: 18px; color: var(--accent2); }
+
+    .visits-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .visits-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .visits-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(42,42,62,0.5);
+    }
+
+    .visits-table tr:hover td { background: rgba(108,92,231,0.05); }
+
+    .map-link {
+      color: var(--accent2);
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .map-link:hover { text-decoration: underline; }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text2);
+    }
+
+    .empty-state p { font-size: 14px; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      background: var(--success);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      z-index: 999;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 20px;
+      min-width: 140px;
+      flex: 1;
+    }
+
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent2);
+    }
+
+    .actions { display: flex; gap: 8px; }
+
+    .table-wrap { overflow-x: auto; }
+
+    @media (max-width: 600px) {
+      .container { padding: 12px; }
+      .form-row { flex-direction: column; }
+      .stats-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>CACHOS <span>Link Tracker</span></h1>
+</div>
+
+<div class="container">
+  <!-- Create Link Form -->
+  <div class="create-form">
+    <h2>Crear enlace de rastreo</h2>
+    <div class="form-row">
+      <input type="url" id="inputUrl" placeholder="URL de destino (ej: https://google.com)" />
+      <input type="text" id="inputTitle" placeholder="Nombre (opcional)" />
+      <button class="btn btn-primary" onclick="createLink()">Crear</button>
+    </div>
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-header">
+      <h2 id="detailTitle">Visitas</h2>
+      <div class="actions">
+        <button class="btn btn-ghost btn-sm" onclick="closeDetail()">Cerrar</button>
+        <button class="btn btn-danger btn-sm" id="btnDelete" onclick="deleteCurrentLink()">Eliminar</button>
+      </div>
+    </div>
+    <div class="stats-row" id="statsRow"></div>
+    <div class="table-wrap">
+      <table class="visits-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>IP</th>
+            <th>Pais</th>
+            <th>Region</th>
+            <th>Ciudad</th>
+            <th>ISP</th>
+            <th>Mapa</th>
+            <th>User Agent</th>
+          </tr>
+        </thead>
+        <tbody id="visitsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Links List -->
+  <div class="links-grid" id="linksList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let currentLinkId = null;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function getTrackingUrl(code) {
+    return `${location.origin}/t/${code}`;
+  }
+
+  async function loadLinks() {
+    const res = await fetch('/api/links');
+    const links = await res.json();
+    const container = document.getElementById('linksList');
+
+    if (links.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No hay enlaces creados. Crea uno arriba.</p></div>';
+      return;
+    }
+
+    container.innerHTML = links.map(l => `
+      <div class="link-card" onclick="openDetail('${l.id}', '${escHtml(l.title || l.code)}')">
+        <div class="link-card-top">
+          <span class="link-card-title">${escHtml(l.title || 'Sin nombre')}</span>
+          <span class="badge badge-visits">${l.visit_count} visita${l.visit_count !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="link-card-meta">
+          <span class="tracking-url" onclick="event.stopPropagation(); copyUrl('${l.code}')">${getTrackingUrl(l.code)}</span>
+          <span>Destino: ${escHtml(truncate(l.destination, 50))}</span>
+          <span>${timeAgo(l.created_at)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function createLink() {
+    const destination = document.getElementById('inputUrl').value.trim();
+    const title = document.getElementById('inputTitle').value.trim();
+    if (!destination) return showToast('Ingresa una URL de destino');
+
+    const res = await fetch('/api/links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ destination, title }),
+    });
+
+    if (res.ok) {
+      const link = await res.json();
+      document.getElementById('inputUrl').value = '';
+      document.getElementById('inputTitle').value = '';
+      await navigator.clipboard.writeText(getTrackingUrl(link.code)).catch(() => {});
+      showToast('Enlace creado y copiado al portapapeles');
+      loadLinks();
+    }
+  }
+
+  async function openDetail(id, title) {
+    currentLinkId = id;
+    document.getElementById('detailTitle').textContent = title;
+    document.getElementById('detailPanel').classList.add('active');
+
+    const res = await fetch(`/api/links/${id}/visits`);
+    const visits = await res.json();
+
+    const countries = [...new Set(visits.map(v => v.country))].filter(Boolean);
+    document.getElementById('statsRow').innerHTML = `
+      <div class="stat-card"><div class="stat-label">Total visitas</div><div class="stat-value">${visits.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Paises</div><div class="stat-value">${countries.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Ultima visita</div><div class="stat-value" style="font-size:14px">${visits.length ? timeAgo(visits[0].visited_at) : '-'}</div></div>
+    `;
+
+    document.getElementById('visitsBody').innerHTML = visits.length === 0
+      ? '<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:24px">Sin visitas todavia</td></tr>'
+      : visits.map(v => `
+        <tr>
+          <td>${formatDate(v.visited_at)}</td>
+          <td style="font-family:monospace;font-size:12px">${escHtml(v.ip)}</td>
+          <td>${escHtml(v.country)}</td>
+          <td>${escHtml(v.region)}</td>
+          <td>${escHtml(v.city)}</td>
+          <td>${escHtml(v.isp)}</td>
+          <td>${v.lat && v.lon ? `<a class="map-link" href="https://www.google.com/maps?q=${v.lat},${v.lon}" target="_blank">Ver mapa</a>` : '-'}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${escHtml(v.user_agent || '')}</td>
+        </tr>
+      `).join('');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeDetail() {
+    document.getElementById('detailPanel').classList.remove('active');
+    currentLinkId = null;
+  }
+
+  async function deleteCurrentLink() {
+    if (!currentLinkId) return;
+    if (!confirm('Eliminar este enlace y todas sus visitas?')) return;
+    await fetch(`/api/links/${currentLinkId}`, { method: 'DELETE' });
+    closeDetail();
+    showToast('Enlace eliminado');
+    loadLinks();
+  }
+
+  async function copyUrl(code) {
+    const url = getTrackingUrl(code);
+    await navigator.clipboard.writeText(url).catch(() => {});
+    showToast('URL copiada: ' + url);
+  }
+
+  function escHtml(s) {
+    if (!s) return '';
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function truncate(s, n) {
+    return s && s.length > n ? s.slice(0, n) + '...' : s;
+  }
+
+  function formatDate(d) {
+    if (!d) return '-';
+    const dt = new Date(d + 'Z');
+    return dt.toLocaleString('es');
+  }
+
+  function timeAgo(d) {
+    if (!d) return '';
+    const diff = (Date.now() - new Date(d + 'Z').getTime()) / 1000;
+    if (diff < 60) return 'hace un momento';
+    if (diff < 3600) return `hace ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `hace ${Math.floor(diff/3600)}h`;
+    return `hace ${Math.floor(diff/86400)}d`;
+  }
+
+  document.getElementById('inputUrl').addEventListener('keydown', e => {
+    if (e.key === 'Enter') createLink();
+  });
+
+  loadLinks();
+</script>
+
+</body>
+</html>
