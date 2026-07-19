@@ -315,7 +315,6 @@
             <th>Pais</th>
             <th>Region</th>
             <th>Ciudad</th>
-            <th>ISP</th>
             <th>Mapa</th>
             <th>User Agent</th>
           </tr>
@@ -407,7 +406,7 @@
     `;
 
     document.getElementById('visitsBody').innerHTML = visits.length === 0
-      ? '<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:24px">Sin visitas todavia</td></tr>'
+      ? '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:24px">Sin visitas todavia</td></tr>'
       : visits.map(v => `
         <tr>
           <td>${formatDate(v.visited_at)}</td>
@@ -415,7 +414,6 @@
           <td>${escHtml(v.country)}</td>
           <td>${escHtml(v.region)}</td>
           <td>${escHtml(v.city)}</td>
-          <td>${escHtml(v.isp)}</td>
           <td>${v.lat && v.lon ? `<a class="map-link" href="https://www.google.com/maps?q=${v.lat},${v.lon}" target="_blank">Ver mapa</a>` : '-'}</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${escHtml(v.user_agent || '')}</td>
         </tr>
@@ -457,13 +455,13 @@
 
   function formatDate(d) {
     if (!d) return '-';
-    const dt = new Date(d + 'Z');
+    const dt = new Date(d);
     return dt.toLocaleString('es');
   }
 
   function timeAgo(d) {
     if (!d) return '';
-    const diff = (Date.now() - new Date(d + 'Z').getTime()) / 1000;
+    const diff = (Date.now() - new Date(d).getTime()) / 1000;
     if (diff < 60) return 'hace un momento';
     if (diff < 3600) return `hace ${Math.floor(diff/60)} min`;
     if (diff < 86400) return `hace ${Math.floor(diff/3600)}h`;

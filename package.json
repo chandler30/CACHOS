@@ -1,17 +1,11 @@
 {
   "name": "cachos",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "start": "node server.js"
+    "dev": "vercel dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "better-sqlite3": "^12.11.1",
-    "express": "^5.2.1"
+    "@neondatabase/serverless": "^1.1.0"
   }
 }
