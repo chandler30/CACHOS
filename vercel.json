@@ -1,4 +1,7 @@
 {
+  "installCommand": "npm install",
+  "buildCommand": "",
+  "outputDirectory": "public",
   "rewrites": [
     { "source": "/t/:code", "destination": "/api/track/:code" }
   ]
